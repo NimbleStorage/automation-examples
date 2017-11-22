@@ -15,17 +15,21 @@
 #   limitations under the License.
 #
 
-- hosts: localhost
-  connection: local
-  tasks:
-    - include_tasks: tasks/util_shim_inventory.yml
+- name: List Swarm instances
+  ec2_instance_facts:
+    filters:
+      "tag:cluster": "{{ swarm_cluster }}"
+      instance-state-name: running
+  register: ec2
 
-- hosts: "{{ hostvars.shim.swarm_group }}"
-  serial: 1
-  roles:
-    - destroy_cv
+- set_fact:
+    instances: "{{ instances | default([]) + [ item.instance_id ] }}"
+  no_log: True
+  with_items: "{{ ec2.instances }}"
 
-- hosts: localhost
-  roles:
-    - destroy_elb
-    - destroy_ec2
+- name: Terminate EC2
+  ec2:
+    instance_ids: "{{ instances }}"
+    wait: True
+    state: absent
+  when: instances is defined
