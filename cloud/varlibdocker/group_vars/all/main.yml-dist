@@ -1,0 +1,32 @@
+---
+# Configure these
+swarm_region: us-west-1
+swarm_key: myawskey
+swarm_subnet: subnet-00000000
+swarm_cidr: "0.0.0.0/0"
+swarm_cloud: vpc-00000000
+
+# My Cloud Volumes home
+cloud_portal_http_host: cloudvolumes.hpe.com
+
+# My Docker Swarm EC2 environment
+swarm_provider: "Amazon AWS"
+swarm_instance: t2.micro
+swarm_image: ami-1c1d217c
+
+# My Swarm Cluster
+swarm_managers: 3
+swarm_workers: 5
+swarm_cluster: labs
+
+# App specifics
+swarm_app_name: minio
+swarm_nginx_lb: "drajen/minio_proxy:latest"
+swarm_elb_frontend: 9000
+swarm_elb_backend: 9000
+
+# Simplified grouping
+swarm_group: "tag_cluster_{{ swarm_cluster }}"
+swarm_master_group: "tag_manager_{{ swarm_cluster }}_master" 
+swarm_manager_group: "tag_swarm_{{ swarm_cluster }}_manager" 
+swarm_worker_group: "tag_swarm_{{ swarm_cluster }}_worker" 

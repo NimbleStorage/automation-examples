@@ -1,0 +1,4 @@
+---
+minio_access_key: nimble
+minio_secret_key: nimblestorage
+minio_stack_url: https://github.com/minio/minio/blob/master/docs/orchestration/docker-swarm/docker-compose-secrets.yaml?raw=true

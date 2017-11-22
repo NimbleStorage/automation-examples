@@ -1,0 +1,50 @@
+---
+#
+#   (C) Copyright 2017 Hewlett Packard Enterprise Development LP.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+- hosts: localhost
+  connection: local
+  roles:
+    - deploy_ec2
+
+  tasks:
+    - name: Refresh inventory
+      command: contrib/inventory/ec2.py --refresh-cache
+    - meta: refresh_inventory
+    - include_tasks: tasks/util_shim_inventory.yml
+
+- hosts: "{{ hostvars.shim.swarm_group }}"
+  gather_facts: no
+  tasks:
+    - name: Ping nodes
+      raw: hostname
+
+    - name: Get Ansible working
+      raw: test -f /usr/bin/python || sudo apt-get update && sudo apt-get install -y python python-boto python-jmespath
+      args:
+        executable: /bin/bash
+
+- hosts: "{{ hostvars.shim.swarm_group }}"
+  serial: 1
+  roles:
+    - deploy_cv
+  tasks:
+    - name: Show Cloud Volume mountpoint
+      command: df -h /var/lib/docker
+      register: mountpoint
+
+    - debug:
+        var: mountpoint.stdout_lines.1

@@ -1,0 +1,56 @@
+---
+#
+#   (C) Copyright 2017 Hewlett Packard Enterprise Development LP.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+- name: Create Cloud Volume
+  include_role:
+    name: NimbleStorage.Ansinimble
+  vars:
+    cloud_object: volume
+    cloud_operation: create
+    cloud_volume: varlibdocker-{{ ec2_id }}
+    cloud_volume_provider: "{{ swarm_provider }}"
+    cloud_volume_region: "{{ swarm_region }}"
+    cloud_volume_options:
+      private_cloud: "{{ swarm_cloud }}"
+      existing_cloud_subnet: "{{ swarm_cidr }}"
+
+- name: Map Cloud Volume
+  include_role:
+    name: NimbleStorage.Ansinimble
+  vars:
+    cloud_object: volume
+    cloud_operation: map
+    cloud_volume: varlibdocker-{{ ec2_id }}
+    cloud_host_ip: "{{ ansible_default_ipv4.address }}"
+
+- name: Install Linux Connection Manager
+  include_role:
+    name: NimbleStorage.Ansinimble
+  vars:
+    cloud_object: lcm
+    cloud_operation: manage
+    cloud_lcm_state: present
+
+- name: Mount Cloud Volume
+  include_role:
+    name: NimbleStorage.Ansinimble
+  vars:
+    cloud_object: volume
+    cloud_operation: mount
+    cloud_volume: varlibdocker-{{ ec2_id }}
+    cloud_volume_mountpoint: /var/lib/docker
+    cloud_volume_mkfs_options: "-n ftype=1"
