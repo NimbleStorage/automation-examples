@@ -1,5 +1,5 @@
 # Storage and Infrastructure Automation
-This repository containers examples on how you can automation daunting management tasks for HPE Nimble Storage and adjacent technology. 
+This repository contains examples on how you can automate daunting management tasks for HPE Nimble Storage and adjacent technologies.
 
 # Examples
 * [varlibdocker](cloud/varlibdocker) on HPE Cloud Volumes using Ansible and AWS
