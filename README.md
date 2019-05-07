@@ -3,6 +3,7 @@ This repository contains examples on how you can automate daunting management ta
 
 # Examples
 * [varlibdocker](cloud/varlibdocker) on HPE Cloud Volumes using Ansible and AWS (Tutorial available [here](https://developer.hpe.com/blog/apps-and-infrastructure-as-code-with-ansible-using-hpe-cloud-volumes-and))
+* [Anisnimble Hello World](ansinimble/helloworld) tutorial avaialble [here](https://datamattsson.tumblr.com/post/184716336821/an-ansinimble-tutorial).
 
 # License
 This software is [licensed](LICENSE) under Apache 2.0.
