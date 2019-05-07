@@ -1,0 +1,22 @@
+---
+- hosts: myhosts
+  roles:
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: umount
+      }
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: detach
+      }
+
+- hosts: mygroup
+  roles:
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: unmap
+      }
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: delete
+      }

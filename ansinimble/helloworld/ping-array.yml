@@ -1,0 +1,13 @@
+---
+- hosts: mygroup
+  roles:
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: group,
+        nimble_operation: facts,
+        nimble_group_facts: {
+          groups: "fields=version_current"
+        }
+      }
+  tasks:
+    - debug:
+        var: nimble_group_facts

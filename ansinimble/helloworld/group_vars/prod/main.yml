@@ -1,0 +1,6 @@
+---
+nimble_group_options:
+  ip-address: 10.18.160.197
+  username: admin
+nimble_group_password: admin
+nimble_linux_toolkit_bundle: /tmp/nlt_installer
