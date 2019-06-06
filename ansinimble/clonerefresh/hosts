@@ -1,0 +1,9 @@
+[myhosts]
+sjc-tme-vlnx000
+
+[mygroup]
+sjc-tme-nva000 ansible_connection=local
+
+[prod:children]
+myhosts
+mygroup

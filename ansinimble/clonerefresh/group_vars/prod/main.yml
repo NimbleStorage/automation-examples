@@ -1,0 +1,14 @@
+---
+nimble_group_options:
+  ip-address: 10.18.160.197
+  username: admin
+nimble_group_password: admin
+nimble_linux_toolkit_bundle: /tmp/nlt_installer
+
+# My local vars
+my_volume_src: myvol1
+
+# Clone refresh vars
+nimble_volume: mycln1
+nimble_host_name: sjc-tme-vlnx000
+nimble_volume_mountpoint: /mycln1
