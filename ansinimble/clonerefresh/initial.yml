@@ -1,0 +1,28 @@
+---
+- hosts: mygroup
+  roles:
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: snapshot,
+        nimble_volume: "{{ my_volume_src }}"
+      }
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: create,
+        nimble_volume_from: "{{ my_volume_src }}"
+      }
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: map,
+      }
+
+- hosts: myhosts
+  roles:
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: attach,
+      }
+    - { role: NimbleStorage.Ansinimble,
+        nimble_object: volume,
+        nimble_operation: mount,
+      }
