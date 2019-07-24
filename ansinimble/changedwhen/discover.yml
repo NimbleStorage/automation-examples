@@ -1,0 +1,13 @@
+---
+- hosts: prod
+  tasks:
+  - name: Discover new LUNs
+    become: yes
+    command: ncmadm -e {{ array_discovery_ip | quote }}
+    register: ncmadm
+    changed_when: ncmadm.stdout is search("Login to the new devices:")
+
+  - name: Stuff to do with my new LUNs
+    debug:
+      msg: "We have new LUNs"
+    when: ncmadm.changed
