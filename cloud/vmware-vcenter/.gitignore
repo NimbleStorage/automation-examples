@@ -1,0 +1,2 @@
+host_vars/localhost
+roles/prepare/files/authorized_keys

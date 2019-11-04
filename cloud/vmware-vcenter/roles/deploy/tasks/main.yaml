@@ -1,0 +1,31 @@
+---
+- name: Create a virtual machine from a template
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    resource_pool: "{{ vcenter_resource_pool }}"
+    validate_certs: no
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+    state: poweredon
+    template: "{{ vcenter_template }}"
+    disk: "{{ machine_disks }}"
+    convert: thin
+    hardware:
+      memory_mb: "{{ machine_memory_mb }}"
+      num_cpus: "{{ machine_num_cpus }}"
+      num_cpu_cores_per_socket: "{{ machine_num_cpu_cores_per_socket }}"
+      boot_firmware: "efi"
+    networks: "{{ machine_networks }}"
+    customization:
+      hostname: "{{ item }}"
+    wait_for_ip_address: yes
+    wait_for_customization: yes
+  delegate_to: localhost
+  register: deploy
+  with_items:
+    - "{{ vm_names }}"
+  tags:
+    - provision

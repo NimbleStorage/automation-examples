@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  roles:
+    - { role: prepare,
+        vm_names: "{{ groups[machine_group] }}"
+      }

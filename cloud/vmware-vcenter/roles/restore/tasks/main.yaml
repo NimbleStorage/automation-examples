@@ -1,0 +1,31 @@
+---
+- name: Revert a VM to a snapshot
+  vmware_guest_snapshot:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+    snapshot_name: "{{ snapshot }}"
+    state: revert
+    validate_certs: no
+  delegate_to: localhost
+  register: snapshotted
+  with_items:
+    - "{{ vm_names }}"
+
+- name: Power On VM
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+    state: poweredon
+    validate_certs: no
+  delegate_to: localhost
+  register: poweredon
+  with_items:
+    - "{{ vm_names }}"

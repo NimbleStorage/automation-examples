@@ -1,0 +1,66 @@
+---
+- name: Gather info about VM
+  vmware_guest_facts:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    validate_certs: no
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+  delegate_to: localhost
+  register: facts
+  with_items:
+    - "{{ vm_names }}"
+
+- name: Register IP in inventory
+  add_host:
+    name: "{{ item.item }}"
+    ansible_ssh_host: "{{ item.instance.ipv4 }}"
+    ansible_ssh_user: "{{ machine_initial_user }}"
+    ansible_ssh_pass: "{{ machine_initial_password }}"
+  with_items:
+    - "{{ facts.results }}"
+
+- name: Test VM
+  ping:
+    data: peekaboo
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups[machine_group] }}"
+  become: yes
+
+- name: Create ansible user
+  user:
+    name: "{{ machine_user }}"
+    groups: wheel
+    create_home: yes
+    generate_ssh_key: yes
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups[machine_group] }}"
+  become: yes
+
+- name: Upload new sudoers
+  copy:
+    src: sudoers
+    dest: /etc/sudoers
+    mode: "0440"
+    owner: root
+    group: root
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups[machine_group] }}"
+  become: yes
+
+- name: Upload authorized_keys
+  copy:
+    src: authorized_keys
+    dest: /home/{{ machine_user }}/.ssh/authorized_keys
+    mode: "0600"
+    owner: "{{ machine_user }}"
+    group: wheel
+  delegate_to: "{{ item }}"
+  with_items:
+    - "{{ groups[machine_group] }}"
+  become: yes

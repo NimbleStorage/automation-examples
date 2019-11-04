@@ -1,0 +1,17 @@
+---
+- name: Destroy a virtual machine
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    resource_pool: "{{ vcenter_resource_pool }}"
+    validate_certs: no
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+    state: absent
+    force: yes
+  delegate_to: localhost
+  register: destroy
+  with_items:
+    - "{{ vm_names }}"

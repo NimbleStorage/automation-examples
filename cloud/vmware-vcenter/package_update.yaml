@@ -1,0 +1,14 @@
+---
+- hosts: machines
+  become: yes
+  tasks:
+    - name: Update all packages
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+    - name: Reboot
+      reboot:
+    - name: Ping
+      ping:
+        data: gogo

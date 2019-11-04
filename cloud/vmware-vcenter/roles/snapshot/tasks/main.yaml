@@ -1,0 +1,16 @@
+---
+- name: Create a VM snapshot
+  vmware_guest_snapshot:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    folder: "{{ vcenter_folder }}"
+    name: "{{ item }}"
+    snapshot_name: "{{ snapshot }}"
+    state: present
+    validate_certs: no
+  delegate_to: localhost
+  register: snapshotted
+  with_items:
+    - "{{ vm_names }}"

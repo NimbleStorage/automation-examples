@@ -1,0 +1,29 @@
+---
+# vcenter config
+vcenter_hostname: myvcenter.datamattsson.io
+vcenter_username: username@vcenter.foobar
+vcenter_password: thisisyourvcenterpassword
+vcenter_datastore: thisisyourdatastore
+vcenter_folder: yourfolder (usually '/')
+vcenter_template: thenameofyourtemplate
+vcenter_datacenter: vcenterdcwecareabout
+vcenter_resource_pool: theresourcepoolweuse 
+
+# Misc config
+machine_group: machines
+machine_user: ubuntu
+machine_initial_user: root
+machine_initial_password: osboxes.org
+
+# Machine config
+machine_memory_mb: 2048
+machine_num_cpus: 2
+machine_num_cpu_cores_per_socket: 1
+machine_networks: 
+  - name: VM Network
+  - name: My Other Network
+# Size must be larger or equal to VM template
+machine_disks:
+  - size_gb: 500 
+    type: thinProvisioned
+    datastore: "{{ vcenter_datastore }}"

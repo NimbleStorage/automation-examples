@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  roles: 
+  - { role: snapshot,
+      vm_names: "{{ groups[machine_group] }}"
+    }

@@ -1,0 +1,7 @@
+---
+- include_tasks: run.yaml
+  with_items:
+    - "{{ groups['onprem'] }}"
+  loop_control:
+    loop_var: myvar
+
