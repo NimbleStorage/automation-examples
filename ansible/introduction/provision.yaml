@@ -1,0 +1,99 @@
+---
+- name: Provision a Nimble Volume to a SAN host 
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  collections:
+    - hpe.nimble
+  tasks:
+    - block:
+        - name: Create Volume
+          hpe_nimble_volume:
+            host: "{{ nimble_host }}"
+            username: "{{ nimble_user }}"
+            password: "{{ nimble_pass }}"
+            state: present
+            name: "{{ volume_name }}"
+            size: "{{ volume_size | default('1000') }}"
+            description: "Volume for {{ volume_igroup }}"
+          register: volume
+        
+        - name: Set facts to pass on to node play
+          set_fact:
+            volume_target_name: "{{ volume.attrs.target_name }}"
+            volume_serial_number: "{{ volume.attrs.serial_number }}"
+
+      when: volume_clone is not defined
+
+    - block: 
+        - name: Create Volume from Snapshot
+          hpe_nimble_volume:
+            host: "{{ nimble_host }}"
+            username: "{{ nimble_user }}"
+            password: "{{ nimble_pass }}"
+            state: present
+            name: "{{ volume_name }}"
+            size: "{{ volume_size | default('1000') }}"
+            description: "Volume for {{ volume_igroup }}"
+            snapshot: "{{ snapshot_name | default(False) }}"
+            clone: "{{ volume_clone | default(False) }}"
+            parent: "{{ clone_from | default(False) }}"
+          register: volume
+ 
+        - name: Set facts to pass on to node play
+          set_fact:
+            volume_target_name: "{{ volume.attrs.target_name }}"
+            volume_serial_number: "{{ volume.attrs.serial_number }}"
+
+      when: volume_clone is defined
+
+    - name: Create ACR
+      hpe_nimble_access_control_record:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        state: present
+        initiator_group: "{{ volume_igroup }}"
+        volume: "{{ volume_name }}"
+
+- name: Attach a volume, format and mount it on a host
+  hosts: "{{ volume_igroup }}"
+  tasks:
+    - name: Discover Target
+      become: yes
+      open_iscsi:
+        portal: "{{ hostvars[nimble_array]['nimble_discovery_ip'] }}"
+        discover: yes
+        show_nodes: yes
+    
+    - name: Attach Target
+      become: yes
+      open_iscsi:
+        target: "{{ hostvars[nimble_array]['volume_target_name'] }}"
+        login: yes
+        automatic: yes
+        show_nodes: yes
+
+    - name: Set volume device fact
+      set_fact:
+        volume_device_path: /dev/disk/by-id/dm-uuid-mpath-2{{ hostvars[nimble_array]['volume_serial_number'] }}
+
+    - name: Create Filesystem
+      become: yes
+      filesystem:
+        fstype: xfs
+        dev: "{{ volume_device_path }}"
+    
+    - name: Mount the Volume
+      become: yes
+      mount:
+        fstype: xfs
+        state: mounted
+        path: /mnt/{{ volume_name }}
+        src: "{{ volume_device_path }}"
+
+    - name: Set Permissions
+      become: yes
+      file:
+        owner: "{{ ansible_env.LOGNAME }}"
+        path: /mnt/{{ volume_name }}

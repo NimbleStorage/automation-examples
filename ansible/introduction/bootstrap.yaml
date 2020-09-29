@@ -1,0 +1,24 @@
+---
+- name: Bootstrap
+  hosts: all
+  tasks:
+    - name: Install packages
+      become: yes
+      package:
+        state: present
+        name: "{{ item }}"
+      with_items:
+        - device-mapper-multipath
+        - sg3_utils
+        - iscsi-initiator-utils
+        - python3
+
+    - name: Start services
+      become: yes
+      service:
+        name: "{{ item }}"
+        state: restarted
+        enabled: true
+      with_items: 
+        - iscsid
+        - multipathd

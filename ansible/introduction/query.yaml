@@ -1,0 +1,26 @@
+---
+- name: Query a Nimble array volume
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Inspect volume
+      hpe_nimble_info:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        gather_subset:
+          - volumes:
+              query:
+                name: "{{ volume_name }}"
+              fields:
+                - limit_iops
+                - description
+                - iscsi_sessions
+      register: query
+
+    - name: Results
+      debug:
+        var: query
