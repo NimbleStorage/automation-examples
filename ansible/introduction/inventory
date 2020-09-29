@@ -1,0 +1,18 @@
+[nodes]
+node22 ansible_host=192.168.159.22
+node23 ansible_host=192.168.159.23
+
+[nodes:vars]
+ansible_user=vagrant
+ansible_password=vagrant
+
+[arrays]
+nva nimble_host=192.168.59.130 nimble_discovery_ip=192.168.59.130
+
+[arrays:vars]
+ansible_connection=local
+nimble_user=admin
+nimble_pass=admin
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

@@ -1,0 +1,17 @@
+---
+- name: Mutate a Nimble array volume
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Mutate volume
+      hpe_nimble_volume:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        limit_iops: "{{ volume_iops | default('-1') }}"
+        description: "{{ volume_description | default('') }}"
+        name: "{{ volume_name }}"
+        state: present

@@ -1,0 +1,17 @@
+---
+- name: Create a Snapshot of a Nimble Volume
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Snapshot operation
+      hpe_nimble_snapshot:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        volume: "{{ volume_name }}"
+        name: "{{ snapshot_name }}"
+        description: "Snapshot created by Ansible"
+        state: "{{ snapshot_state | default('present') }}"

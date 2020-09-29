@@ -1,0 +1,26 @@
+---
+- name: Retrieve node facts
+  hosts: nodes
+
+- name: Create iSCSI initators for hosts in nodes group
+  gather_facts: false
+  hosts: arrays
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Add host
+      hpe_nimble_initiator_group:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        access_protocol: iscsi
+        name: "{{ item }}"
+        iscsi_initiators: [
+          {
+            iqn: "{{ hostvars[item]['ansible_iscsi_iqn'] }}",
+            label: "{{ item }}"
+          }
+        ]
+        description: "Initiator Group for {{ item }}"
+        state: present
+      with_items: "{{ groups.nodes }}"

@@ -1,0 +1,75 @@
+---
+- name: Prepare to delete Nimble Volume
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Fetch Volume info
+      hpe_nimble_info:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        gather_subset:
+          - volumes:
+              fields:
+                - target_name
+              query:
+                name: "{{ volume_name }}"
+              detail: True
+      register: volumes
+      failed_when: volumes.nimble_info.volumes.0.target_name is not defined
+
+    - name: Set facts to pass on to node play
+      set_fact:
+        volume_target_name: "{{ volumes.nimble_info.volumes.0.target_name }}"
+
+- name: Unmount and detach a Nimble Volume from a host
+  hosts: "{{ volume_igroup }}"
+  tasks:
+    - name: Unmount the Volume
+      become: yes
+      mount:
+        fstype: xfs
+        state: absent
+        path: /mnt/{{ volume_name }}
+    
+    - name: Detach Target
+      become: yes
+      open_iscsi:
+        target: "{{ hostvars[nimble_array]['volume_target_name'] }}"
+        login: no
+
+    - name: Delete Target
+      become: yes
+      command: iscsiadm -m node -o delete -T {{ hostvars[nimble_array]['volume_target_name'] }}
+
+- name: Delete a Nimble Volume
+  gather_facts: false
+  connection: local
+  hosts: "{{ nimble_array }}"
+  tags:
+    - array_only
+  collections:
+    - hpe.nimble
+  tasks:
+    - name: Offline Volume
+      hpe_nimble_volume:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        state: present
+        online: False
+        force: True
+        name: "{{ volume_name }}"
+      register: offline
+      until: offline is not failed
+
+    - name: Delete Volume
+      hpe_nimble_volume:
+        host: "{{ nimble_host }}"
+        username: "{{ nimble_user }}"
+        password: "{{ nimble_pass }}"
+        state: absent
+        name: "{{ volume_name }}"
